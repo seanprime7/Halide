@@ -16,7 +16,6 @@ jobs:
       CC: ${{matrix.cc}}
       CXX: ${{matrix.cxx}}
       LD: ${{matrix.ld}}
-      PYTHON: python3.7
 
     strategy:
       fail-fast: false  # Keep running other jobs even if one fails
@@ -24,11 +23,17 @@ jobs:
         # TODO: this is probably overkill; we probably don't need to build the full
         # matrix (and since we are limited to 8 concurrent tests, it would be
         # useful to prune this a bit).
-        target_arch: [x86]  #, arm]
+        target_arch: [arm]
         target_bits: [32, 64]
-        target_os: [linux, osx, windows]
-        llvm_version: [9, 10, 11]
-        build_tool: [cmake_shared, make]  # TODO: cmake_static is still dodgy?
+        target_os: [linux]
+        llvm_version: [9]
+        build_tool: [cmake_shared]  # TODO: cmake_static is still dodgy?
+        python_version: '3.7'
+        # target_arch: [x86]  #, arm]
+        # target_bits: [32, 64]
+        # target_os: [linux, osx, windows]
+        # llvm_version: [9, 10, 11]
+        # build_tool: [cmake_shared, make]  # TODO: cmake_static is still dodgy?
         include:
           - llvm_version: 9
             llvm_branch: release/9.x
@@ -59,54 +64,62 @@ jobs:
             cxx: cl.exe
             ld: ld.exe
 
+          - target_arch: x86
+            uses_python: true
+
+          - target_arch: arm
+            # Don't bother building/testing Python bindings on arm targets (yet)
+            uses_python: false
+
+          - build_tool: cmake_shared
+            # TODO: revisit when CMake python builds are working
+            uses_python: false
+
         exclude:
-          # Don't attempt 32-bit builds for macos
           - target_os: osx
+            target_arch: arm
+            # Don't attempt 32-bit builds for macos
             target_bits: 32
-          # Don't use make on windows
           - target_os: windows
+            target_arch: arm
+            # Windows is CMake-only
+            build_tool: make
+          # crosscompiling/testing for arm is CMake-only
+          - target_arch: arm
             build_tool: make
 
     steps:
-    # - name: Inspect
-    #   shell: bash
-    #   run: |
-    #     echo `pwd`
-    #     ls -la .
-    #     echo GITHUB_WORKSPACE ${GITHUB_WORKSPACE}
-    #     ls -la ${GITHUB_WORKSPACE}
-    #     echo HOME ${HOME}
-    #     ls -la ${HOME}
-    #     echo /
-    #     ls -la /
-    #     echo /home
-    #     ls -la /home
-    #     echo /home/runner
-    #     ls -la /home/runner
-    #     echo /home/runner/work
-    #     ls -la /home/runner/work
-    #     echo /home/runner/work/Halide
-    #     ls -la /home/runner/work/Halide
-    #     echo /home/runner/work/Halide/Halide
-    #     ls -la /home/runner/work/Halide/Halide
-
     - uses: actions/checkout@v2
       with:
         path: 'halide'
 
     - name: Configure Python (64-bit)
-      if: matrix.target_bits == 64
+      if: matrix.uses_python && matrix.target_bits == 64
       uses: actions/setup-python@v1
       with:
-        python-version: '3.7'
+        python-version: '${{matrix.python_version}}'
         architecture: 'x64' # N.B.: 'x86' is only available for Windows (Ubuntu is special-cased below)
 
     - name: Configure Python (32-bit)
-      if: matrix.target_os == 'windows' && matrix.target_bits == 32
+      if: matrix.uses_python && matrix.target_os == 'windows' && matrix.target_bits == 32
       uses: actions/setup-python@v1
       with:
-        python-version: '3.7'
+        python-version: '${{matrix.python_version}}'
         architecture: 'x86'
+
+    - name: Install Python Dependencies
+      if: matrix.uses_python
+      shell: bash
+      run: |
+        if [[ ${{matrix.host_os}} == windows* ]]; then
+          # On Windows, it's just 'python', apparently
+          echo ::set-env name=PYTHON::"python"
+        else
+          echo ::set-env name=PYTHON::"python${{matrix.python_version}}"
+        fi
+        ${PYTHON} -m pip --version
+        ${PYTHON} -m pip install --upgrade pip
+        ${PYTHON} -m pip install -r ${HALIDE_SOURCE_DIR}/python_bindings/requirements.txt
 
     - name: Configure Ubuntu Host
       if: startsWith(matrix.host_os, 'ubuntu')
@@ -153,15 +166,10 @@ jobs:
           libpng \
           zlib
 
-        # On Windows, it's just 'python', apparently
-        echo ::set-env name=PYTHON::"python"
-
-    - name: Configure Ubuntu-32
-      if: matrix.target_os == 'linux' && matrix.target_bits == 32
+    - name: Configure x86-32 Crosscompilation
+      if: matrix.target_os == 'linux' && matrix.target_os == 'x86' && matrix.target_bits == 32
       shell: bash
       run: |
-        set -eu
-
         sudo dpkg --add-architecture i386
         sudo apt-get update
         sudo apt-get install \
@@ -169,8 +177,8 @@ jobs:
           ${{matrix.cxx}}-multilib \
           libjpeg-dev:i386 \
           libpng-dev:i386 \
-          python3.7-dev:i386 \
-          python3.7:i386
+          ${PYTHON}-dev:i386 \
+          ${PYTHON}:i386
 
         # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
         sudo apt-get install \
@@ -178,25 +186,70 @@ jobs:
           libglu1-mesa-dev:i386 \
           mesa-common-dev:i386
 
-        # TODO: worth bothering with? Saves a little space.
-        # sudo apt autoremove
-
-        file $(which python3.7)
+        file $(which ${PYTHON})
 
         # Verify that we have a 32-bit build
-        PYVERSION=`python3.7 - << EOF
+        PYVERSION=`${PYTHON} - << EOF
         import platform
         print(platform.architecture()[0])
         EOF`
 
         if [[ $PYVERSION != 32bit ]]; then
-          echo Expected 32-bit version of Python 3.7, found ${PYVERSION}
+          echo Expected 32-bit version of Python ${{matrix.python_version}}, found ${PYVERSION}
           exit 1
         fi
 
-        # TODO: is this necessary?
-        # echo ::set-env name=HL_TARGET::"x86-32-linux"
-        # echo ::set-env name=HL_JIT_TARGET::"x86-32-linux"
+    - name: Configure Arm Crosscompilation
+      if: matrix.target_os == 'linux' && matrix.target_os == 'arm' && matrix.target_bits == 32
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install \
+          ${{matrix.cc}}-arm-linux-gnueabihf \
+          ${{matrix.cxx}}-arm-linux-gnueabihf \
+          libc6-dev-armhf-cross \
+          qemu-user \
+          qemu-user-binfmt \
+
+        sudo dpkg --add-architecture armhf
+        sudo apt-get update
+        sudo apt-get install \
+          libjpeg-dev:armhf \
+          libpng-dev:armhf
+
+        # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
+        sudo apt-get install \
+          freeglut3-dev:armhf \
+          libglu1-mesa-dev:armhf \
+          mesa-common-dev:armhf
+
+        echo ::set-env name=QEMU_LD_PREFIX::"/usr/arm-linux-gnueabihf"
+
+    - name: Configure AArch64 Crosscompilation
+      if: matrix.target_os == 'linux' && matrix.target_os == 'arm' && matrix.target_bits == 64
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install \
+          ${{matrix.cc}}-aarch64-linux-gnu \
+          ${{matrix.cxx}}-aarch64-linux-gnu \
+          libc6-dev-aarch64-cross \
+          qemu-user \
+          qemu-user-binfmt \
+
+        sudo dpkg --add-architecture aarch64
+        sudo apt-get update
+        sudo apt-get install \
+          libjpeg-dev:aarch64 \
+          libpng-dev:aarch64
+
+        # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
+        sudo apt-get install \
+          freeglut3-dev:armhf \
+          libglu1-mesa-dev:armhf \
+          mesa-common-dev:armhf
+
+        echo ::set-env name=QEMU_LD_PREFIX::"/usr/aarch64-linux-gnu"
 
     - name: Configure Env Vars
       shell: bash
@@ -215,20 +268,9 @@ jobs:
         echo ::set-env name=HALIDE_TEMP_DIR::"${_TEMP}"
         echo ::set-env name=PARALLEL_JOBS::"4"
 
-    - name: Install Python Dependencies
-      shell: bash
-      run: |
-        set -eu
-
-        ${PYTHON} -m pip --version
-        ${PYTHON} -m pip install --upgrade pip
-        ${PYTHON} -m pip install -r ${HALIDE_SOURCE_DIR}/python_bindings/requirements.txt
-
     - name: Install LLVM
       shell: bash
       run: |
-        set -eu
-
         LLVM_ID="llvm-${{matrix.llvm_version}}-${{matrix.target_arch}}-${{matrix.target_bits}}-${{matrix.target_os}}"
 
         curl \
@@ -270,8 +312,6 @@ jobs:
       shell: bash
       run: |
         # Configure CMake
-        set -eu
-
         echo `cmake --version`
 
         mkdir ${HALIDE_BUILD_DIR}
@@ -309,7 +349,17 @@ jobs:
                              -D LLVM_ENABLE_SUPPORT_XCODE_SIGNPOSTS=FORCE_OFF"
         fi
 
-        # TODO: target_arch==arm
+        if [[ ${{matrix.target_arch}} == arm ]]; then
+          if [[ ${{matrix.target_bits}} == 32 ]]; then
+            EXTRA_CMAKE_FLAGS="${EXTRA_CMAKE_FLAGS} \
+              -D CMAKE_TOOLCHAIN_FILE=${HALIDE_SOURCE_DIR}/cmake/toolchain.linux-arm.cmake"
+          else
+            EXTRA_CMAKE_FLAGS="${EXTRA_CMAKE_FLAGS} \
+              -D CMAKE_TOOLCHAIN_FILE=${HALIDE_SOURCE_DIR}/cmake/toolchain.linux-aarch64.cmake"
+          fi
+          # TODO
+          CMAKE_GEN="Unix Makefiles"
+        fi
 
         REQUIRE_LLVM_VERSION="${{matrix.llvm_version}}0"
         SHARED_LIBRARY=$([ ${{matrix.build_tool}} == "cmake_shared" ] && echo "ON" || echo "OFF")
@@ -329,8 +379,6 @@ jobs:
       shell: bash
       run: |
         # Build Halide
-        set -eu
-
         cd ${HALIDE_BUILD_DIR}
 
         make -f ${HALIDE_SOURCE_DIR}/Makefile -j ${PARALLEL_JOBS} distrib build_tests build_python_bindings build_apps
@@ -340,8 +388,6 @@ jobs:
       shell: bash
       run: |
         # Build Halide
-        set -eu
-
         cd ${HALIDE_BUILD_DIR}
         cmake \
           --build ${HALIDE_BUILD_DIR} \
@@ -353,12 +399,13 @@ jobs:
       shell: bash
       run: |
         # Test Halide
-        set -eu
-
         export TEST_TMPDIR="${HALIDE_TEMP_DIR}"
         cd ${HALIDE_BUILD_DIR}
 
-        TEST_GROUPS_PARALLEL="internal correctness error warning generator python"
+        TEST_GROUPS_PARALLEL="internal correctness error warning generator"
+        if [[ "${{matrix.uses_python}}" == "true" ]]; then
+          TEST_GROUPS_PARALLEL="${TEST_GROUPS_PARALLEL} python"
+        fi
 
         # tutorial has some performance measurements that can be flaky if we run them in parallel
         TEST_GROUPS_SERIAL="performance tutorial"
@@ -390,9 +437,12 @@ jobs:
       shell: bash
       run: |
         # Test Halide
-        set -eu
-
         TEST_GROUPS_PARALLEL="internal|correctness|error|warning|generator"
+
+        # TODO: once CMake supports the python stuff
+        # if [[ "${{matrix.uses_python}}" == "true" ]]; then
+        #   TEST_GROUPS_PARALLEL="${TEST_GROUPS_PARALLEL}|python"
+        # fi
 
         # tutorial has some performance measurements that can be flaky if we run them in parallel
         TEST_GROUPS_SERIAL="performance|tutorial"
