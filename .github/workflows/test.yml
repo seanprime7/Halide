@@ -206,9 +206,17 @@ jobs:
         sudo apt-get update
         sudo apt-get install \
           ${{matrix.cc}}-arm-linux-gnueabihf \
+
+        sudo apt-get install \
           ${{matrix.cxx}}-arm-linux-gnueabihf \
+
+        sudo apt-get install \
           libc6-dev-armhf-cross \
+
+        sudo apt-get install \
           qemu-user \
+
+        sudo apt-get install \
           qemu-user-binfmt \
 
         sudo dpkg --add-architecture armhf
@@ -232,22 +240,30 @@ jobs:
         sudo apt-get update
         sudo apt-get install \
           ${{matrix.cc}}-aarch64-linux-gnu \
+
+        sudo apt-get install \
           ${{matrix.cxx}}-aarch64-linux-gnu \
+
+        sudo apt-get install \
           libc6-dev-arm64-cross \
+
+        sudo apt-get install \
           qemu-user \
+
+        sudo apt-get install \
           qemu-user-binfmt \
 
         sudo dpkg --add-architecture aarch64
         sudo apt-get update
         sudo apt-get install \
-          libjpeg-dev:aarch64 \
-          libpng-dev:aarch64
+          libjpeg-dev:arm64 \
+          libpng-dev:arm64
 
         # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
         sudo apt-get install \
           freeglut3-dev:armhf \
-          libglu1-mesa-dev:armhf \
-          mesa-common-dev:armhf
+          libglu1-mesa-dev:arm64 \
+          mesa-common-dev:arm64
 
         echo ::set-env name=QEMU_LD_PREFIX::"/usr/aarch64-linux-gnu"
 
