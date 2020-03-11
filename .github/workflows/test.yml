@@ -167,7 +167,7 @@ jobs:
           zlib
 
     - name: Configure x86-32 Crosscompilation
-      if: matrix.target_os == 'linux' && matrix.target_os == 'x86' && matrix.target_bits == 32
+      if: matrix.target_os == 'linux' && matrix.target_arch == 'x86' && matrix.target_bits == 32
       shell: bash
       run: |
         sudo dpkg --add-architecture i386
@@ -199,8 +199,8 @@ jobs:
           exit 1
         fi
 
-    - name: Configure Arm Crosscompilation
-      if: matrix.target_os == 'linux' && matrix.target_os == 'arm' && matrix.target_bits == 32
+    - name: Configure Arm32 Crosscompilation
+      if: matrix.target_os == 'linux' && matrix.target_arch == 'arm' && matrix.target_bits == 32
       shell: bash
       run: |
         sudo apt-get update
@@ -226,7 +226,7 @@ jobs:
         echo ::set-env name=QEMU_LD_PREFIX::"/usr/arm-linux-gnueabihf"
 
     - name: Configure AArch64 Crosscompilation
-      if: matrix.target_os == 'linux' && matrix.target_os == 'arm' && matrix.target_bits == 64
+      if: matrix.target_os == 'linux' && matrix.target_arch == 'arm' && matrix.target_bits == 64
       shell: bash
       run: |
         sudo apt-get update
