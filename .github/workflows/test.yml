@@ -204,12 +204,18 @@ jobs:
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install \
+        sudo apt-get install --install-suggests \
           ${{matrix.cc}}-arm-linux-gnueabihf \
           ${{matrix.cxx}}-arm-linux-gnueabihf \
-          libc6-dev-armhf-cross \
+          # libc6-dev-armhf-cross \
           qemu-user \
           qemu-user-binfmt
+
+        echo ${{matrix.cc}}-arm-linux-gnueabihf
+        which ${{matrix.cc}}-arm-linux-gnueabihf
+
+        echo gcc-arm-linux-gnueabihf
+        which gcc-arm-linux-gnueabihf
 
         # echo sudo dpkg --add-architecture armhf
         # echo
@@ -219,9 +225,9 @@ jobs:
         # sudo apt-get update
         # echo libjpeg-dev:armhf libpng-dev:armhf
         # echo
-        # sudo apt-get install \
-        #   libjpeg-dev:armhf \
-        #   libpng-dev:armhf
+        sudo apt-get install \
+          libjpeg-dev:armhf \
+          libpng-dev:armhf
 
         # # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
         # sudo apt-get install \
@@ -236,10 +242,10 @@ jobs:
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install \
+        sudo apt-get install --install-suggests \
           ${{matrix.cc}}-aarch64-linux-gnu \
           ${{matrix.cxx}}-aarch64-linux-gnu \
-          libc6-dev-arm64-cross \
+          #libc6-dev-arm64-cross \
           qemu-user \
           qemu-user-binfmt \
 
