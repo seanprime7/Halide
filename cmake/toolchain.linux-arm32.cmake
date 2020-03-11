@@ -10,8 +10,8 @@ if (NOT DEFINED CXX)
   set(CXX "g++")
 endif ()
 
-SET(CMAKE_C_COMPILER   arm-linux-gnueabihf-${CC})
-SET(CMAKE_CXX_COMPILER arm-linux-gnueabihf-${CXX})
+SET(CMAKE_C_COMPILER   /usr/bin/arm-linux-gnueabihf-${CC})
+SET(CMAKE_CXX_COMPILER /usr/bin/arm-linux-gnueabihf-${CXX})
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
