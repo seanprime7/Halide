@@ -204,23 +204,40 @@ jobs:
       shell: bash
       run: |
         sudo apt-get update
+
+        echo ${{matrix.cc}}-arm-linux-gnueabihf
+        echo
         sudo apt-get install \
           ${{matrix.cc}}-arm-linux-gnueabihf \
 
+        echo ${{matrix.cxx}}-arm-linux-gnueabihf
+        echo
         sudo apt-get install \
           ${{matrix.cxx}}-arm-linux-gnueabihf \
 
+        echo libc6-dev-armhf-cross
+        echo
         sudo apt-get install \
           libc6-dev-armhf-cross \
 
+        echo qemu-user
+        echo
         sudo apt-get install \
           qemu-user \
 
+        echo qemu-user-binfmt
+        echo
         sudo apt-get install \
           qemu-user-binfmt \
 
+        echo sudo dpkg --add-architecture armhf
+        echo
         sudo dpkg --add-architecture armhf
+        echo sudo apt-get update
+        echo
         sudo apt-get update
+        echo libjpeg-dev:armhf libpng-dev:armhf
+        echo
         sudo apt-get install \
           libjpeg-dev:armhf \
           libpng-dev:armhf
