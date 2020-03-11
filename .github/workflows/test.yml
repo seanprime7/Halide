@@ -28,7 +28,7 @@ jobs:
         target_os: [linux]
         llvm_version: [9]
         build_tool: [cmake_shared]  # TODO: cmake_static is still dodgy?
-        python_version: 3.7
+        python_version: ['3.7']
         # target_arch: [x86]  #, arm]
         # target_bits: [32, 64]
         # target_os: [linux, osx, windows]
