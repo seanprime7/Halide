@@ -207,7 +207,6 @@ jobs:
         sudo apt-get install --install-suggests \
           ${{matrix.cc}}-arm-linux-gnueabihf \
           ${{matrix.cxx}}-arm-linux-gnueabihf \
-          # libc6-dev-armhf-cross \
           qemu-user \
           qemu-user-binfmt
 
@@ -245,7 +244,6 @@ jobs:
         sudo apt-get install --install-suggests \
           ${{matrix.cc}}-aarch64-linux-gnu \
           ${{matrix.cxx}}-aarch64-linux-gnu \
-          #libc6-dev-arm64-cross \
           qemu-user \
           qemu-user-binfmt \
 
