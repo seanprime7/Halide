@@ -220,27 +220,32 @@ jobs:
         echo sudo dpkg --add-architecture armhf
         echo
         sudo dpkg --add-architecture armhf
-        echo sudo apt-get update
-        echo
-        sudo apt-get update
 
-        echo 2 /etc/apt/sources.list
+        echo 3 /etc/apt/sources.list
         echo
         sudo cat /etc/apt/sources.list
 
-        echo IOBLIBS
-        echo libjpeg-dev:armhf libpng-dev:armhf
-        echo
-        sudo apt-get install \
-          libjpeg-dev:armhf \
-          libpng-dev:armhf
+        # echo sudo apt-get update
+        # echo
+        # sudo apt-get update
 
-        # # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
-        echo OPENGL
-        sudo apt-get install \
-          freeglut3-dev:armhf \
-          libglu1-mesa-dev:armhf \
-          mesa-common-dev:armhf
+        # echo 3 /etc/apt/sources.list
+        # echo
+        # sudo cat /etc/apt/sources.list
+
+        # echo IOBLIBS
+        # echo libjpeg-dev:armhf libpng-dev:armhf
+        # echo
+        # sudo apt-get install \
+        #   libjpeg-dev:armhf \
+        #   libpng-dev:armhf
+
+        # # # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
+        # echo OPENGL
+        # sudo apt-get install \
+        #   freeglut3-dev:armhf \
+        #   libglu1-mesa-dev:armhf \
+        #   mesa-common-dev:armhf
 
         echo ::set-env name=QEMU_LD_PREFIX::"/usr/arm-linux-gnueabihf"
 
@@ -260,17 +265,17 @@ jobs:
 
         # sudo dpkg --add-architecture aarch64
         # sudo apt-get update
-        echo IOBLIBS
-        sudo apt-get install \
-          libjpeg-dev:arm64 \
-          libpng-dev:arm64
+        # echo IOBLIBS
+        # sudo apt-get install \
+        #   libjpeg-dev:arm64 \
+        #   libpng-dev:arm64
 
-        # # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
-        echo OPENGL
-        sudo apt-get install \
-          freeglut3-dev:arm64 \
-          libglu1-mesa-dev:arm64 \
-          mesa-common-dev:arm64
+        # # # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
+        # echo OPENGL
+        # sudo apt-get install \
+        #   freeglut3-dev:arm64 \
+        #   libglu1-mesa-dev:arm64 \
+        #   mesa-common-dev:arm64
 
         echo ::set-env name=QEMU_LD_PREFIX::"/usr/aarch64-linux-gnu"
 
@@ -380,8 +385,6 @@ jobs:
             EXTRA_CMAKE_FLAGS="${EXTRA_CMAKE_FLAGS} \
               -D CMAKE_TOOLCHAIN_FILE=${HALIDE_SOURCE_DIR}/cmake/toolchain.linux-aarch64.cmake"
           fi
-          # TODO
-          CMAKE_GEN="Unix Makefiles"
         fi
 
         REQUIRE_LLVM_VERSION="${{matrix.llvm_version}}0"
