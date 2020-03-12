@@ -211,16 +211,14 @@ jobs:
         echo AFTER
         cat /etc/apt/sources.list
 
-        # sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo dpkg --add-architecture armhf
+
         sudo apt-get update
         sudo apt-get install --install-suggests \
           ${{matrix.cc}}-arm-linux-gnueabihf \
           ${{matrix.cxx}}-arm-linux-gnueabihf \
           qemu-user \
           qemu-user-binfmt
-
-        # sudo apt-add-repository universe
-        # sudo apt-get update
 
         echo IOBLIBS
         echo libjpeg-dev:armhf libpng-dev:armhf
@@ -250,6 +248,8 @@ jobs:
         echo AFTER
         cat /etc/apt/sources.list
 
+        sudo dpkg --add-architecture aarch64
+
         sudo apt-get update
         sudo apt-get install --install-suggests \
           ${{matrix.cc}}-aarch64-linux-gnu \
@@ -257,21 +257,17 @@ jobs:
           qemu-user \
           qemu-user-binfmt
 
-        # sudo dpkg --add-architecture armhf
-        # sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        # sudo apt-add-repository universe
-        # sudo apt-get update
         echo IOBLIBS
         sudo apt-get install \
-          libjpeg-dev:arm64 \
-          libpng-dev:arm64
+          libjpeg-dev:aarch64 \
+          libpng-dev:aarch64
 
         # # # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
         echo OPENGL
         sudo apt-get install \
-          freeglut3-dev:arm64 \
-          libglu1-mesa-dev:arm64 \
-          mesa-common-dev:arm64
+          freeglut3-dev:aarch64 \
+          libglu1-mesa-dev:aarch64 \
+          mesa-common-dev:aarch64
 
         echo ::set-env name=QEMU_LD_PREFIX::"/usr/aarch64-linux-gnu"
 
