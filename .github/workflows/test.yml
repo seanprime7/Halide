@@ -225,13 +225,13 @@ jobs:
         echo
         sudo cat /etc/apt/sources.list
 
-        # echo sudo apt-get update
-        # echo
-        # sudo apt-get update
+        echo sudo apt-get update
+        echo
+        sudo apt-get update
 
-        # echo 3 /etc/apt/sources.list
-        # echo
-        # sudo cat /etc/apt/sources.list
+        echo 3 /etc/apt/sources.list
+        echo
+        sudo cat /etc/apt/sources.list
 
         # echo IOBLIBS
         # echo libjpeg-dev:armhf libpng-dev:armhf
