@@ -10,8 +10,8 @@ if (NOT DEFINED CXX)
   set(CXX "g++")
 endif ()
 
-SET(CMAKE_C_COMPILER   /usr/bin/aarch64-linux-gnu-${CC})
-SET(CMAKE_CXX_COMPILER /usr/bin/aarch64-linux-gnu-${CXX})
+SET(CMAKE_C_COMPILER   aarch64-linux-gnu-${CC})
+SET(CMAKE_CXX_COMPILER aarch64-linux-gnu-${CXX})
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
