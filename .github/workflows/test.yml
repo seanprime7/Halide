@@ -225,13 +225,13 @@ jobs:
         echo
         sudo cat /etc/apt/sources.list
 
-        echo sudo apt-get update
-        echo
-        sudo apt-get update
+        # echo sudo apt-get update
+        # echo
+        # sudo apt-get update
 
-        echo 3 /etc/apt/sources.list
-        echo
-        sudo cat /etc/apt/sources.list
+        # echo 3 /etc/apt/sources.list
+        # echo
+        # sudo cat /etc/apt/sources.list
 
         # echo IOBLIBS
         # echo libjpeg-dev:armhf libpng-dev:armhf
@@ -381,14 +381,14 @@ jobs:
           # The arm toolchain files default to "gcc"/"g++" with no version appended,
           # but we installed specific versions, so be sure it can find those specific versions.
           if [[ ${{matrix.target_bits}} == 32 ]]; then
-            export CC=arm-linux-gnueabihf-${{matrix.cc}}
-            export CXX=arm-linux-gnueabihf-${{matrix.cxx}}
             EXTRA_CMAKE_FLAGS="${EXTRA_CMAKE_FLAGS} \
+              -D CMAKE_C_COMPILER=arm-linux-gnueabihf-${{matrix.cc}} \
+              -D CMAKE_CXX_COMPILER=arm-linux-gnueabihf-${{matrix.cxx}} \
               -D CMAKE_TOOLCHAIN_FILE=${HALIDE_SOURCE_DIR}/cmake/toolchain.linux-arm32.cmake"
           else
-            export CC=aarch64-linux-gnu-${{matrix.cc}}
-            export CXX=aarch64-linux-gnu-${{matrix.cxx}}
             EXTRA_CMAKE_FLAGS="${EXTRA_CMAKE_FLAGS} \
+              -D CMAKE_C_COMPILER=aarch64-linux-gnu-${{matrix.cc}} \
+              -D CMAKE_CXX_COMPILER=aarch64-linux-gnu-${{matrix.cxx}} \
               -D CMAKE_TOOLCHAIN_FILE=${HALIDE_SOURCE_DIR}/cmake/toolchain.linux-aarch64.cmake"
           fi
         fi

@@ -3,17 +3,12 @@
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR aarch64)
 
-set(CC "$ENV{CC}")
-set(CXX "$ENV{CXX}")
-if ("${CC}" STREQUAL "")
-  set(CC gcc)
+if (NOT DEFINED CMAKE_C_COMPILER)
+    set(CMAKE_C_COMPILER aarch64-linux-gnu-gcc)
 endif()
-if ("${CXX}" STREQUAL "")
-  set(CXX g++)
+if (NOT DEFINED CMAKE_CXX_COMPILER)
+    set(CMAKE_CXX_COMPILER aarch64-linux-gnu-g++)
 endif()
-
-SET(CMAKE_C_COMPILER   aarch64-linux-gnu-${CC})
-SET(CMAKE_CXX_COMPILER aarch64-linux-gnu-${CXX})
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
