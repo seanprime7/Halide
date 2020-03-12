@@ -210,42 +210,22 @@ jobs:
           qemu-user \
           qemu-user-binfmt
 
-        echo ls -l /usr/bin/*gcc*
-        ls -l /usr/bin/*gcc*
+        sudo add-apt-repository ppa:ubuntu-raspi2/ppa
+        sudo apt-get update
 
-        echo /etc/apt/sources.list
+        echo IOBLIBS
+        echo libjpeg-dev:armhf libpng-dev:armhf
         echo
-        sudo cat /etc/apt/sources.list
-
-        echo sudo dpkg --add-architecture armhf
-        echo
-        sudo dpkg --add-architecture armhf
-
-        echo 3 /etc/apt/sources.list
-        echo
-        sudo cat /etc/apt/sources.list
-
-        # echo sudo apt-get update
-        # echo
-        # sudo apt-get update
-
-        # echo 3 /etc/apt/sources.list
-        # echo
-        # sudo cat /etc/apt/sources.list
-
-        # echo IOBLIBS
-        # echo libjpeg-dev:armhf libpng-dev:armhf
-        # echo
-        # sudo apt-get install \
-        #   libjpeg-dev:armhf \
-        #   libpng-dev:armhf
+        sudo apt-get install \
+          libjpeg-dev:armhf \
+          libpng-dev:armhf
 
         # # # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
-        # echo OPENGL
-        # sudo apt-get install \
-        #   freeglut3-dev:armhf \
-        #   libglu1-mesa-dev:armhf \
-        #   mesa-common-dev:armhf
+        echo OPENGL
+        sudo apt-get install \
+          freeglut3-dev:armhf \
+          libglu1-mesa-dev:armhf \
+          mesa-common-dev:armhf
 
         echo ::set-env name=QEMU_LD_PREFIX::"/usr/arm-linux-gnueabihf"
 
@@ -260,22 +240,19 @@ jobs:
           qemu-user \
           qemu-user-binfmt
 
-        echo ls -l /usr/bin/*gcc*
-        ls -l /usr/bin/*gcc*
-
-        # sudo dpkg --add-architecture aarch64
-        # sudo apt-get update
-        # echo IOBLIBS
-        # sudo apt-get install \
-        #   libjpeg-dev:arm64 \
-        #   libpng-dev:arm64
+        sudo add-apt-repository ppa:ubuntu-raspi2/ppa
+        sudo apt-get update
+        echo IOBLIBS
+        sudo apt-get install \
+          libjpeg-dev:arm64 \
+          libpng-dev:arm64
 
         # # # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
-        # echo OPENGL
-        # sudo apt-get install \
-        #   freeglut3-dev:arm64 \
-        #   libglu1-mesa-dev:arm64 \
-        #   mesa-common-dev:arm64
+        echo OPENGL
+        sudo apt-get install \
+          freeglut3-dev:arm64 \
+          libglu1-mesa-dev:arm64 \
+          mesa-common-dev:arm64
 
         echo ::set-env name=QEMU_LD_PREFIX::"/usr/aarch64-linux-gnu"
 
@@ -381,13 +358,13 @@ jobs:
           # The arm toolchain files default to "gcc"/"g++" with no version appended,
           # but we installed specific versions, so be sure it can find those specific versions.
           if [[ ${{matrix.target_bits}} == 32 ]]; then
-            export ARCH_FOR_TESTS=cortex-a9
+            export ARCH_FOR_TESTS=armv7-a
             EXTRA_CMAKE_FLAGS="${EXTRA_CMAKE_FLAGS} \
               -D CMAKE_C_COMPILER=arm-linux-gnueabihf-${{matrix.cc}} \
               -D CMAKE_CXX_COMPILER=arm-linux-gnueabihf-${{matrix.cxx}} \
               -D CMAKE_TOOLCHAIN_FILE=${HALIDE_SOURCE_DIR}/cmake/toolchain.linux-arm32.cmake"
           else
-            export ARCH_FOR_TESTS=cortex-a72
+            export ARCH_FOR_TESTS=armv8-a
             EXTRA_CMAKE_FLAGS="${EXTRA_CMAKE_FLAGS} \
               -D CMAKE_C_COMPILER=aarch64-linux-gnu-${{matrix.cc}} \
               -D CMAKE_CXX_COMPILER=aarch64-linux-gnu-${{matrix.cxx}} \
