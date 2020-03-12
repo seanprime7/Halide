@@ -206,7 +206,7 @@ jobs:
         echo BEFORE
         cat /etc/apt/sources.list
 
-        sudo sed -i 's/^# deb-src /deb-src/g' /etc/apt/sources.list
+        sudo sed -i 's/^# deb-src /deb-src /g' /etc/apt/sources.list
 
         echo AFTER
         cat /etc/apt/sources.list
@@ -245,7 +245,7 @@ jobs:
         echo BEFORE
         cat /etc/apt/sources.list
 
-        sudo sed -i 's/^# deb-src /deb-src/g' /etc/apt/sources.list
+        sudo sed -i 's/^# deb-src /deb-src /g' /etc/apt/sources.list
 
         echo AFTER
         cat /etc/apt/sources.list
