@@ -210,20 +210,27 @@ jobs:
           qemu-user \
           qemu-user-binfmt
 
-        echo ${{matrix.cc}}-arm-linux-gnueabihf
-        which ${{matrix.cc}}-arm-linux-gnueabihf
-
         echo ls -l /usr/bin/*gcc*
         ls -l /usr/bin/*gcc*
 
-        # echo sudo dpkg --add-architecture armhf
-        # echo
-        # sudo dpkg --add-architecture armhf
-        # echo sudo apt-get update
-        # echo
-        # sudo apt-get update
-        # echo libjpeg-dev:armhf libpng-dev:armhf
+        echo /etc/apt/sources.list
+        echo
+        sudo cat /etc/apt/sources.list
+
+        echo sudo dpkg --add-architecture armhf
+        echo
+        sudo dpkg --add-architecture armhf
+        echo sudo apt-get update
+        echo
+        sudo apt-get update
+
+        echo 2 /etc/apt/sources.list
+        echo
+        sudo cat /etc/apt/sources.list
+
         echo IOBLIBS
+        echo libjpeg-dev:armhf libpng-dev:armhf
+        echo
         sudo apt-get install \
           libjpeg-dev:armhf \
           libpng-dev:armhf
@@ -246,7 +253,7 @@ jobs:
           ${{matrix.cc}}-aarch64-linux-gnu \
           ${{matrix.cxx}}-aarch64-linux-gnu \
           qemu-user \
-          qemu-user-binfmt \
+          qemu-user-binfmt
 
         echo ls -l /usr/bin/*gcc*
         ls -l /usr/bin/*gcc*
