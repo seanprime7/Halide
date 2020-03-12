@@ -381,11 +381,13 @@ jobs:
           # The arm toolchain files default to "gcc"/"g++" with no version appended,
           # but we installed specific versions, so be sure it can find those specific versions.
           if [[ ${{matrix.target_bits}} == 32 ]]; then
+            export ARCH_FOR_TESTS=cortex-a9
             EXTRA_CMAKE_FLAGS="${EXTRA_CMAKE_FLAGS} \
               -D CMAKE_C_COMPILER=arm-linux-gnueabihf-${{matrix.cc}} \
               -D CMAKE_CXX_COMPILER=arm-linux-gnueabihf-${{matrix.cxx}} \
               -D CMAKE_TOOLCHAIN_FILE=${HALIDE_SOURCE_DIR}/cmake/toolchain.linux-arm32.cmake"
           else
+            export ARCH_FOR_TESTS=cortex-a72
             EXTRA_CMAKE_FLAGS="${EXTRA_CMAKE_FLAGS} \
               -D CMAKE_C_COMPILER=aarch64-linux-gnu-${{matrix.cc}} \
               -D CMAKE_CXX_COMPILER=aarch64-linux-gnu-${{matrix.cxx}} \
