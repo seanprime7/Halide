@@ -213,7 +213,7 @@ jobs:
 
         sudo dpkg --add-architecture armhf
 
-        sudo apt-get update
+        sudo apt-get update --ignore-missing
         sudo apt-get install --install-suggests \
           ${{matrix.cc}}-arm-linux-gnueabihf \
           ${{matrix.cxx}}-arm-linux-gnueabihf \
@@ -250,7 +250,7 @@ jobs:
 
         sudo dpkg --add-architecture aarch64
 
-        sudo apt-get update
+        sudo apt-get update --ignore-missing
         sudo apt-get install --install-suggests \
           ${{matrix.cc}}-aarch64-linux-gnu \
           ${{matrix.cxx}}-aarch64-linux-gnu \
