@@ -213,7 +213,7 @@ jobs:
         echo ${{matrix.cc}}-arm-linux-gnueabihf
         which ${{matrix.cc}}-arm-linux-gnueabihf
 
-        echo gcc-arm-linux-gnueabihf
+        echo ls -l /usr/bin/*gcc*
         ls -l /usr/bin/*gcc*
 
         # echo sudo dpkg --add-architecture armhf
@@ -248,7 +248,7 @@ jobs:
           qemu-user \
           qemu-user-binfmt \
 
-        echo gcc-aarch64-linux-gnu
+        echo ls -l /usr/bin/*gcc*
         ls -l /usr/bin/*gcc*
 
         # sudo dpkg --add-architecture aarch64
