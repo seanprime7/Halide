@@ -1,7 +1,3 @@
-# TODO:
-#  cmake_static is generally broken.
-#  test_auto_schedule is flaky.
-
 name: Build+Test
 on:
   # TODO: not sure if this is the proper set of events/activity-types we want?
@@ -53,7 +49,7 @@ jobs:
             host_os: ubuntu-18.04
             # GHA has clang 6, 8, and 9 and GCC 7.4, 8.3, 9.2 preinstalled.
             # We will explicitly choose gcc 7.x (even though the default is gcc 7.4)
-            # To ensure we match gcc versions with the arm crosscompiler.
+            # to ensure we match gcc versions with the arm crosscompiler.
             cc: gcc-7
             cxx: g++-7
             ld: ld
@@ -203,35 +199,30 @@ jobs:
       if: matrix.target_os == 'linux' && matrix.target_arch == 'arm' && matrix.target_bits == 32
       shell: bash
       run: |
-        # echo BEFORE
-        # cat /etc/apt/sources.list
-        # sudo sed -i 's/^# deb-src /deb-src /g' /etc/apt/sources.list
-        # echo AFTER
-        # cat /etc/apt/sources.list
+        # sudo dpkg --add-architecture armhf
+        # sudo apt-get update
 
-        sudo dpkg --add-architecture armhf
+        # # # # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
+        # echo OPENGL
+        # sudo apt-get install \
+        #   freeglut3-dev:armhf \
+        #   libglu1-mesa-dev:armhf \
+        #   mesa-common-dev:armhf
+
+
         sudo apt-get update
-
-        # # # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
-        echo OPENGL
-        sudo apt-get install \
-          freeglut3-dev:armhf \
-          libglu1-mesa-dev:armhf \
-          mesa-common-dev:armhf
-
-
         sudo apt-get install --install-suggests \
           ${{matrix.cc}}-arm-linux-gnueabihf \
           ${{matrix.cxx}}-arm-linux-gnueabihf \
           qemu-user \
           qemu-user-binfmt
 
-        echo IOBLIBS
-        echo libjpeg-dev:armhf libpng-dev:armhf
-        echo
-        sudo apt-get install \
-          libjpeg-dev:armhf \
-          libpng-dev:armhf
+        # echo IOBLIBS
+        # echo libjpeg-dev:armhf libpng-dev:armhf
+        # echo
+        # sudo apt-get install \
+        #   libjpeg-dev:armhf \
+        #   libpng-dev:armhf
 
         echo ::set-env name=QEMU_LD_PREFIX::"/usr/arm-linux-gnueabihf"
 
@@ -239,33 +230,28 @@ jobs:
       if: matrix.target_os == 'linux' && matrix.target_arch == 'arm' && matrix.target_bits == 64
       shell: bash
       run: |
-        # echo BEFORE
-        # cat /etc/apt/sources.list
-        # sudo sed -i 's/^# deb-src /deb-src /g' /etc/apt/sources.list
-        # echo AFTER
-        # cat /etc/apt/sources.list
+        # sudo dpkg --add-architecture aarch64
+        # sudo apt-get update
 
-        sudo dpkg --add-architecture aarch64
+        # # # # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
+        # echo OPENGL
+        # sudo apt-get install \
+        #   freeglut3-dev:aarch64 \
+        #   libglu1-mesa-dev:aarch64 \
+        #   mesa-common-dev:aarch64
+
+
         sudo apt-get update
-
-        # # # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
-        echo OPENGL
-        sudo apt-get install \
-          freeglut3-dev:aarch64 \
-          libglu1-mesa-dev:aarch64 \
-          mesa-common-dev:aarch64
-
-
         sudo apt-get install --install-suggests \
           ${{matrix.cc}}-aarch64-linux-gnu \
           ${{matrix.cxx}}-aarch64-linux-gnu \
           qemu-user \
           qemu-user-binfmt
 
-        echo IOBLIBS
-        sudo apt-get install \
-          libjpeg-dev:aarch64 \
-          libpng-dev:aarch64
+        # echo IOBLIBS
+        # sudo apt-get install \
+        #   libjpeg-dev:aarch64 \
+        #   libpng-dev:aarch64
 
         echo ::set-env name=QEMU_LD_PREFIX::"/usr/aarch64-linux-gnu"
 
@@ -405,7 +391,12 @@ jobs:
         # Build Halide
         cd ${HALIDE_BUILD_DIR}
 
-        make -f ${HALIDE_SOURCE_DIR}/Makefile -j ${PARALLEL_JOBS} distrib build_tests build_python_bindings build_apps
+        BUILD_TARGETS="distrib build_tests build_apps"
+        if [[ "${{matrix.uses_python}}" == "true" ]]; then
+          BUILD_TARGETS="${BUILD_TARGETS} build_python_bindings"
+        fi
+
+        make -f ${HALIDE_SOURCE_DIR}/Makefile -j ${PARALLEL_JOBS} ${BUILD_TARGETS}
 
     - name: Build Halide (CMake)
       if: startsWith(matrix.build_tool, 'cmake')
