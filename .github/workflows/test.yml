@@ -210,22 +210,22 @@ jobs:
           qemu-user \
           qemu-user-binfmt
 
-        sudo add-apt-repository ppa:ubuntu-raspi2/ppa
-        sudo apt-get update
+        # sudo add-apt-repository ppa:ubuntu-raspi2/ppa
+        # sudo apt-get update
 
-        echo IOBLIBS
-        echo libjpeg-dev:armhf libpng-dev:armhf
-        echo
-        sudo apt-get install \
-          libjpeg-dev:armhf \
-          libpng-dev:armhf
+        # echo IOBLIBS
+        # echo libjpeg-dev:armhf libpng-dev:armhf
+        # echo
+        # sudo apt-get install \
+        #   libjpeg-dev:armhf \
+        #   libpng-dev:armhf
 
-        # # # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
-        echo OPENGL
-        sudo apt-get install \
-          freeglut3-dev:armhf \
-          libglu1-mesa-dev:armhf \
-          mesa-common-dev:armhf
+        # # # # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
+        # echo OPENGL
+        # sudo apt-get install \
+        #   freeglut3-dev:armhf \
+        #   libglu1-mesa-dev:armhf \
+        #   mesa-common-dev:armhf
 
         echo ::set-env name=QEMU_LD_PREFIX::"/usr/arm-linux-gnueabihf"
 
@@ -240,19 +240,19 @@ jobs:
           qemu-user \
           qemu-user-binfmt
 
-        sudo add-apt-repository ppa:ubuntu-raspi2/ppa
-        sudo apt-get update
-        echo IOBLIBS
-        sudo apt-get install \
-          libjpeg-dev:arm64 \
-          libpng-dev:arm64
+        # sudo add-apt-repository ppa:ubuntu-raspi2/ppa
+        # sudo apt-get update
+        # echo IOBLIBS
+        # sudo apt-get install \
+        #   libjpeg-dev:arm64 \
+        #   libpng-dev:arm64
 
-        # # # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
-        echo OPENGL
-        sudo apt-get install \
-          freeglut3-dev:arm64 \
-          libglu1-mesa-dev:arm64 \
-          mesa-common-dev:arm64
+        # # # # TODO(srj): OpenGL is only needed to build the opengl tests (which we don't even run)...
+        # echo OPENGL
+        # sudo apt-get install \
+        #   freeglut3-dev:arm64 \
+        #   libglu1-mesa-dev:arm64 \
+        #   mesa-common-dev:arm64
 
         echo ::set-env name=QEMU_LD_PREFIX::"/usr/aarch64-linux-gnu"
 
